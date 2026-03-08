@@ -1,0 +1,2 @@
+# music-gear-tracker
+A beginner ASP.NET Core MVC CRUD application demonstrating Entity Framework Core through a music gear tracking example.
