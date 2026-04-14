@@ -1,0 +1,82 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+    For this demo, the content was copied from the default Index page
+    located inside the "Home" view folder and then modified.
+*@
+
+@*
+    NOTE:
+    *****
+    In real-world ASP.NET Core MVC applications,
+    the "Index" action typically displays the list of data.
+
+    Index() Action Method => Loading "Index.cshtml" View => List items (with Edit/Delete buttons besides each one)
+
+    In this tutorial, we separate concerns for learning purposes:
+
+        - Index() => Index.cshtml => Navigation page
+        - Instruments() => Instruments.cshtml => Displays the data list
+
+    This approach helps understanding each part step by step.
+*@
+
+@{
+    // C# code inside a Razor view is written inside @ { }
+    ViewData["Title"] = "Instruments Tracker";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to the Instruments Tracker</h1>
+    @* Keep the default ASP.NET documentation link *@
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    @*
+        Adding our navigation link:
+        ***************************
+
+        Razor provides Tag Helpers such as "asp-action"
+        that help generate correct URLs based on MVC routing.
+
+        Example: asp-action="Instruments"
+
+        This tells ASP.NET Core MVC to navigate to the "Instruments()" action method.
+
+        IMPORTANT NOTE:
+        ***************
+        Since this View is rendered from the InstrumentsController,
+        ASP.NET Core automatically assumes the current controller.
+
+        Therefore, we do NOT need to specify: asp-controller="Instruments"
+
+        HOWEVER:
+        ********
+        If this link was used from a different controller/view,
+        we MUST specify the controller explicitly:
+
+            <a asp-controller="Instruments" asp-action="Instruments">
+
+        This ensures correct routing.
+
+        Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/built-in/anchor-tag-helper
+    *@
+        <a asp-action="Instruments" class="btn btn-primary">View All Instruments</a>
+        <a asp-action="Create" class="btn btn-primary">Add a new Instrument</a>
+        <a asp-action="Edit" class="btn btn-primary">Edit an Instrument</a>
+        <a asp-action="Delete" class="btn btn-primary">Delete an Instrument</a>
+
+    @* 
+    NOTE TO RECAP:
+    **************
+    This link were placed inside the Instruments view folder, 
+    so no need for "asp-controller="Instruments":
+
+    <a asp-action="Index" class="btn btn-primary">View All Instruments</a>
+
+
+    If this link were placed outside the Instruments view folder, 
+    we would need "asp-controller="Instruments":
+
+    <a asp-controller="Instruments" asp-action="Index">
+    *@
+</div>

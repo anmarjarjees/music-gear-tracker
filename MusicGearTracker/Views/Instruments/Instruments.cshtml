@@ -1,0 +1,346 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@*
+    MODEL DECLARATION IN RAZOR VIEW:
+    ********************************
+     In ASP.NET Core MVC:
+     > The View receives data from the Controller
+     > The "model" represents the data sent from the Controller to the View
+
+    In our controller action method, we wrote:
+
+        var allInstruments = _context.Instruments.ToList();
+        return View(allInstruments);
+
+    This means we are passing a COLLECTION of Instrument objects to the View.
+
+    Therefore, in the View we must declare the model type, yes we can use either way:
+
+        - Way#1 (Correct - Works Fine): @model List<Instrument>
+        - Way#2 (Recommended - Professional): @model IEnumerable<Instrument>
+
+    In the controller, we used: _context.Instruments.ToList()
+    which returns a List<Instrument>.
+
+    However, in the View we will use "Way#2": @model IEnumerable<Instrument>
+
+    Why IEnumerable<Instrument> and not using List<Instrument>?
+    ***********************************************************
+        - IEnumerable<T> represents a collection of items
+        - It is more flexible than List<T>
+        - It works with List, arrays, and other collection types
+
+    This is a common best practice in ASP.NET Core MVC.
+    In simple terms:
+        List<T> = specific type
+        IEnumerable<T> = general collection (recommended)
+
+    This allows our View to remain flexible and reusable.
+
+    What does this mean?
+    ********************
+    - IEnumerable<Instrument> represents a collection (list) of Instrument objects
+    - It allows us to loop through the data using foreach
+
+    Example usage in the View:
+
+        @foreach (var item in Model)
+        {
+            <p>@item.Name</p>
+        }
+
+    Why IEnumerable instead of List?
+    ********************************
+    - IEnumerable is more flexible (it works with List, arrays, etc.)
+    - It is a common best practice in MVC Views
+
+
+    IMPORTANT CONCEPT: "COUPLING"
+    *****************************
+    As we discussed this concept in Advanced OOP With Java course,
+    "Coupling" refers to how tightly one part of the code depends on another.
+
+    Tight Coupling (Less Flexible):
+    *******************************
+        @model List<Instrument>
+
+        - The View depends specifically on List<T>
+        - If the Controller changes to return a different collection type,
+          the View must also be changed
+
+    Loose Coupling (Recommended):
+    *****************************
+        @model IEnumerable<Instrument>
+
+        - The View depends on a general abstraction (IEnumerable<T>)
+        - It works with ANY collection type (List, Array, IQueryable, etc.)
+        - The View becomes more flexible and reusable
+
+    SUMMARY:
+    ********
+        List<T> = Specific type  (Tightly coupled)
+        IEnumerable<T> = General type (Loosely coupled - Recommended)
+
+    This is a common best practice in ASP.NET Core MVC.
+
+    It allows our View to remain flexible, reusable, and easier to maintain.
+
+    IMPORTANT NOTE:
+    ***************
+    The model type in the View MUST match the data passed from the Controller.
+
+    Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/overview
+*@
+
+@{
+    // C# Code written inside @ { and }
+    ViewData["Title"] = "Instruments List";
+}
+
+@* Using "IEnumerable" to refer to any type of collection: *@
+@model IEnumerable<Instrument>
+
+<div class="text-center">
+    <h1 class="display-4">Instruments List</h1>
+    <p>Below is the list of all instruments</p>
+
+    @*
+        Bootstrap Table:
+        ****************
+        We use Bootstrap classes to style the table.
+
+        Link:
+        https://getbootstrap.com/docs/5.3/content/tables/
+    *@
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                @*
+                    NOTE:
+                    We are displaying a row counter instead of the actual database Id.
+                    This is useful for UI readability.
+                *@
+                <th scope="col">#</th>
+                <th scope="col">Instrument</th>
+                <th scope="col">Description</th>
+                <th scope="col">Price</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @*
+                Looping through the Model collection:
+                *************************************
+
+                - "Model" represents the data passed from the controller
+                - Each item is of type Instrument
+                - We use a foreach loop to render each row
+
+                EMPTY STATE HANDLING:
+                *********************
+                Before looping through the data, we check if the collection is empty.
+                
+                Model.Any() returns:
+                    - true => if there are records
+                    - false => if the collection is empty
+                
+                 If there are no instruments, 
+                 we display a friendly message inside the table.
+            *@
+
+
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No instruments found.
+                    </td>
+                    @*
+                        NOTE:
+                        *****
+                        colspan="5" must match the total number of table columns,
+                        including the "Actions" column.
+
+                        Otherwise, the table layout may break.
+                    *@
+                </tr>
+            }
+            else
+            {
+                @*
+                    Looping through the "Model" collection:
+                    ***************************************
+                *@
+                int row = 1;
+                foreach (var instrument in Model)
+                {
+                    <tr>
+                        <th scope="row">@row</th>
+
+                        @* Displaying Instrument properties *@
+                        <td>@instrument.Name</td>
+                        <td>@instrument.Description</td>
+
+                        @*
+                            Formatting Price as Currency:
+                            *****************************
+                            We use ToString("C") to format the price as a currency value.
+
+                            Example: 2500 => $2,500.00 (based on system culture)
+
+                            "C" stands for Currency format.
+
+                            NOTE:
+                            *****
+                            The displayed currency symbol and format 
+                            depend on the system or application culture settings.
+
+                            This improves readability and provides a better user experience.
+
+                            Link: https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
+                        *@
+                        <td>@instrument.Price.ToString("C")</td>
+                        @*
+                            IMPORTANT:
+                            **********
+                            Tag Helpers like "asp-action" and "asp-route-id" do NOT work with <button> elements.
+
+                            They are designed to work with these UI elements:
+                                - <a> (anchor element)
+                                - <form> (form element)
+
+                            Therefore:
+                                - Use <a> for navigation => **(GET requests)** => with [HttpGet] methods
+                                  > NOT the [HttpPost] methods.
+                                - Use <form> + <button type="submit"> for "POST" actions
+                                  > The "POST" actions are only triggered using <form method="post">
+
+                            Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/intro
+                            
+                            For both edit/delete => we need to specify the ID value:
+                            > asp-route-id="@instrument.Id" => the current id value to be used by the controller
+
+                            Notice that:
+                            - For <a>: The "id" value will be sent via URL (route)
+                            - For <form>: The "id" value will be sent via form POST (route + form)
+                            So:
+                            - <a> => route parameter
+                            - <form> => route + form submission
+
+                            Don't forget that:
+                             - "instrument" is just a loop variable to reference the current item in the "Model"
+                             - "Model" represents the data passed from the controller.
+                             - <a> always sends a "GET" request => Example => GET: /Instruments/Delete/7
+                                > in such case, we should use [HttpGet] for deleting/editing but not secured, not good practice!
+                             - <form method="post"> sends POST requests
+
+                             Consider the following rule again:
+                             - Action: Edit (load/viewing the form element - Just retrieving data) => HTTP Method: GET
+                             - Action: Edit (submit changes - Modifies data) => HTTP Method: POST
+                             - Action: Delete (submit changes - Modifies data) => HTTP Method: POST
+
+                            Therefore:
+                                - Edit => uses <a> (GET) to load form
+                                - Delete => uses <form> (POST)
+                            
+                            In such case:
+                                > <a> always GET => asp-action="Edit" => calls the "GET" Edit action
+                                > <form method="post"> POST => asp-action="Delete" => calls the "POST" Delete action (confirmation page)
+
+                                Example:
+                                    GET => Display page
+                                    POST => Submit data
+
+                            Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/actions
+                        *@
+                        <td>
+
+                            @*
+                                The Standard and Correct Industry Flow of using "Edit" Operation:
+                                *****************************************************************
+                                "Edit" is ALWAYS done in 2 steps:
+                                1️) GET => Load Edit page (Load Form)
+                                    
+                                    [HttpGet]
+                                    public IActionResult Edit(int? id)
+                                
+                                2️) POST => Save changes
+
+                                    [HttpPost]
+                                    public IActionResult Edit(Instrument instrument)
+                            *@
+                            <a class="btn btn-primary me-3" asp-action="Edit" asp-route-id="@instrument.Id">Edit</a>
+
+                            @* 
+                              NOTE About Using "Delete" Below: 
+                              We will implicitly using the HTTP "POST" request instead of "GET" request,
+                              To use the "POST", we need to use <form> with submit <button>,
+                              so each action will have its own form:
+                            *@
+
+                            @* <a class="btn btn-danger" asp-action="Delete" asp-route-id="@instrument.Id">Delete</a> *@
+                            <form asp-action="Delete" asp-route-id="@instrument.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+
+                            @* 
+                                BS NOTES:
+                                > Adding space between buttons => m-2 = margin-end (Bootstrap spacing of 2 points with any screen size)
+                                > using "d-inline"
+
+                                Link: https://getbootstrap.com/docs/5.2/utilities/spacing/
+                                Link: https://getbootstrap.com/docs/5.2/utilities/display/
+                            *@
+
+                            @* Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/built-in/anchor-tag-helper?view=aspnetcore-10.0#asp-route-value *@
+                        </td>
+                    </tr>
+
+                    row++;
+                }
+            }
+        </tbody>
+    </table>
+
+    @*
+    IMPORTANT NOTE (Summary): HTTP METHODS IN MVC:
+    **********************************************
+
+    In ASP.NET Core MVC:
+
+    1) GET request:
+       - Used for retrieving data (safe operations only)
+       - Triggered by <a> (anchor tags)
+
+    2) POST request:
+       - Used for modifying data (Create, Update, Delete)
+       - Triggered by <form method="post">
+
+    APPLYING THIS RULE:
+    *******************
+    - Edit:
+        > GET => Load the Edit form (using <a>)
+        > POST => Submit updated data (using <form>)
+
+    - Delete:
+        > POST only (to safely remove data)
+        > Must NOT be triggered by GET
+
+    WHY NOT USE GET FOR DELETE?
+    ***************************
+    Because GET should NEVER modify data.
+
+    Example of BAD practice:
+        GET /Instruments/Delete/5
+
+    This could be triggered accidentally (bookmark, refresh, crawler)
+
+    Therefore:
+        > Using <form method="post"> for Delete
+
+    Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/actions
+    *@
+</div>

@@ -1,0 +1,142 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    // C# Code written inside @{ }
+    ViewData["Title"] = "Create (Add)";
+}
+
+@model MusicGearTracker.Models.Instrument
+
+<div class="text-center">
+    <h1 class="display-4">Create/Add a New Instrument</h1>
+</div>
+
+@*
+    In ASP.NET Core MVC, we typically use the Form Tag Helper
+    instead of manually setting the HTML "action" attribute.
+
+    The "asp-action" attribute automatically generates the correct
+    URL based on the controller and action method.
+
+    Example:
+        asp-action="Create"
+
+    This will submit the form to the Create() POST action
+    in the current controller (InstrumentsController).
+
+    Official Documentation:
+    https://learn.microsoft.com/aspnet/core/mvc/views/working-with-forms
+*@
+
+@* 
+    NOTE TO REVIEW:
+    ***************
+    The form uses method="post" 
+    because this operation => creates a new record
+
+    According to HTTP conventions:
+        > GET => retrieve data (reading/view existing data)
+        > POST => submit or create data
+
+    If the "method" attribute is omitted in HTML,
+    the browser defaults to "GET"".
+
+    Using POST is the correct approach for Create, Update, and Delete operations
+
+    Link: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form
+
+    
+    In ASP.NET MVC the recommended approach is to use the Form Tag Helper.
+    Instead of manually specifying action => action="", 
+    you should use => asp-action
+
+    The "asp-action" Tag Helper generates the correct URL for submitting the form.
+
+    Because this view "Create.cshtml" belongs to the "Instruments" controller,
+    we do not need to specify or adding the attribute "asp-controller":
+        
+        > asp-controller="Instruments"
+
+    MVC automatically assumes the current controller.
+
+    Generated route:
+        POST /Instruments/Create
+
+    Link: https://learn.microsoft.com/aspnet/core/mvc/views/working-with-forms
+ *@
+
+<form asp-action="Create" method="post">
+    <fieldset>
+        <legend>Adding a new instrument</legend>
+        @* 
+    Many MVC views also include a validation summary at the top of the form: 
+    *@
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        @* Including our reusable form fields from the "_InstrumentForm" partial view *@
+        <partial name="_InstrumentForm" />
+
+        <button type="submit" class="btn btn-primary">
+            Create
+        </button>
+    </fieldset>
+</form>
+
+@* Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-10.0 *@
+
+
+@* 
+    SECTION: Scripts
+    *****************
+    In ASP.NET Core MVC, views can define "sections" that are injected into the layout page.
+
+    What is a "section"?
+    ********************
+    A section is a named block of content that a view sends to the layout.
+
+    The layout (usually _Layout.cshtml) contains (You can check the file):
+         @await RenderSectionAsync("Scripts", required: false)
+
+    This tells ASP.NET Core:
+        "If a view defines a "Scripts"" section, render it here."
+
+    Why do we use a Scripts section?
+    ********************************
+        - To include specific JavaScript files for this specific page
+        - To avoid loading unnecessary (unused) scripts globally (in every page)
+        - To keep the layout clean and reusable
+
+    In our case, we are including validation scripts only for this "Create Instrument" page.
+
+    The "_ValidationScriptsPartial":
+    ********************************
+    This partial view includes JavaScript libraries,
+    these JS libraries required for client-side validation in ASP.NET Core MVC.
+
+    These scripts enable:
+        - Instant validation feedback in the browser (before form submission)
+        - Displaying validation messages dynamically under input fields
+        - Improving user experience
+
+    Without these scripts:
+        - Validation still works on the server side (Inside the Controller => ModelState.IsValid)
+        - But error messages will only appear after submitting the form
+        - No real-time validation in the browser
+
+    With these scripts:
+        - Errors appear immediately as the user types or leaves a field
+        - Form becomes more interactive and user-friendly
+
+    Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/layout?view=aspnetcore-10.0#sections
+
+    Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/working-with-forms?view=aspnetcore-10.0#the-validation-summary-tag-helper
+
+    Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-10.0
+*@
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

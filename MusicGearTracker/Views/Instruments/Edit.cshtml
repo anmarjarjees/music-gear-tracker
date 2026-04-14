@@ -1,0 +1,47 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@model MusicGearTracker.Models.Instrument // to access our model attribute(s) => "Id"
+
+<div class="text-center">
+    <h1 class="display-4">Edit/Modify Instrument</h1>
+</div>
+
+<form action="/" method="post">
+
+
+    @* 
+        Hidden ID field (used mainly for Edit scenarios) 
+        This means the user can NOT type the ID manually
+        In most real applications the ID is not entered by the user
+        In real MVC applications, the ID is usually generated automatically by the database
+
+        In other words, users should never control primary keys.
+
+        In other words:
+        ***************
+        The ID field is hidden because it is typically generated automatically by the database 
+        so it is an "auto-increment primary key"
+
+        Users should not manually enter or modify primary keys
+
+        However, during Edit operations we still send the ID back to the server 
+        using a hidden field so the application knows which record should be updated
+
+        Link: https://learn.microsoft.com/ef/core/modeling/keys
+    *@
+    <input asp-for="Id" type="hidden" />
+    @*
+    - ID is stored in the form
+    - user cannot modify it
+    - it is sent back during Edit operations 
+    *@
+
+    @* Including our form partial code from the "_instrumentForm" view *@
+    <partial name="_InstrumentForm" />
+
+    <button type="submit" class="btn btn-primary">
+        Create
+    </button>
+</form>
