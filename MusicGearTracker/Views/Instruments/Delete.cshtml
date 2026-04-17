@@ -1,14 +1,71 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@{
-}
 
+@*
+    IMPORTANT NOTE:
+    ***************
+    This "Delete" view is intentionally kept for LEARNING and DEMONSTRATION purposes only.
 
-<form asp-action="Create" method="post">
+    In this project, we are using a more streamlined and modern approach:
+        - Deleting items directly from the list page (Instruments.cshtml)
+        - Using a <form method="post"> with a Delete button
+        - Adding a JavaScript confirmation dialog (confirm())
+        (Please review the code in the instruments.cshtml)
+
+    Therefore:
+        - This Delete.cshtml view is NOT used in the current application flow
+        - No [HttpGet] Delete action exists to load this view
+
+    WHEN WOULD THIS VIEW BE USED?
+    *****************************
+    In a more traditional or enterprise-level MVC pattern, Delete is implemented in TWO steps:
+
+    1) GET => Load confirmation page that has the full form's fields filled with the current item info
+       Example: GET /Instruments/Delete/7
+
+        Controller:
+            [HttpGet]
+            public IActionResult Delete(int? id)
+
+        This view (Delete.cshtml) would display:
+            - Instrument details
+            - "Are you sure?" confirmation message
+
+    2) POST => Perform the actual deletion
+        Example: POST /Instruments/Delete/7
+
+        Controller:
+            [HttpPost]
+            [ValidateAntiForgeryToken]
+                public IActionResult Delete(int? id)
+
+    WHY WE DID NOT USE THIS APPROACH:
+    ********************************
+    - It requires:
+        - An extra controller action (GET)
+        - An extra view (which is this file "Delete.cshtml")
+    - Adds more complexity for a simple operation
+
+    Instead, we used the following approach:
+        - Direct POST from the list page
+        - JavaScript confirm() for user confirmation
+        - Cleaner and faster user experience
+
+    SUMMARY:
+    ********
+    - This view is NOT used in the current implementation
+    - It is kept only to demonstrate the "confirmation page" pattern approach
+    - In real projects, BOTH approaches are valid depending on requirements
+
+    Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/actions
+    Link: https://learn.microsoft.com/en-us/aspnet/core/security/anti-request-forgery
+*@
+
+<form asp-action="Delete" method="post">
     @Html.AntiForgeryToken()
+    @* Example placeholder: in real usage, we would pass the Id here *@
+    @* <input type="hidden" name="id" value="@Model.Id" /> *@
 
-    <!-- form fields to be completed here -->
-
-    <button type="submit">Save</button>
+    <button type="submit">Delete</button>
 </form>

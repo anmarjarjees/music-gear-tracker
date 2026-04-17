@@ -247,11 +247,13 @@
                             
                             In such case:
                                 > <a> always GET => asp-action="Edit" => calls the "GET" Edit action
-                                > <form method="post"> POST => asp-action="Delete" => calls the "POST" Delete action (confirmation page)
+                                > <form method="post"> POST => asp-action="Delete" 
+                                    => calls the "POST" Delete action (direct deletion)
+                                    NOTE: Other optional approach: calls the "POST" Delete action (confirmation page)
 
-                                Example:
-                                    GET => Display page
-                                    POST => Submit data
+                            Example:
+                                GET => Display page
+                                POST => Submit data
 
                             Link: https://learn.microsoft.com/en-us/aspnet/core/mvc/controllers/actions
                         *@
@@ -275,15 +277,56 @@
 
                             @* 
                               NOTE About Using "Delete" Below: 
-                              We will implicitly using the HTTP "POST" request instead of "GET" request,
+                              We will implicitly use the HTTP "POST" request instead of "GET" request,
                               To use the "POST", we need to use <form> with submit <button>,
                               so each action will have its own form:
                             *@
 
                             @* <a class="btn btn-danger" asp-action="Delete" asp-route-id="@instrument.Id">Delete</a> *@
-                            <form asp-action="Delete" asp-route-id="@instrument.Id" method="post" class="d-inline">
+
+                            @* 
+                            DELETE OPERATION (POST REQUEST WITH CONFIRMATION):
+                            **************************************************
+                            - This form sends a "POST" request to the "Delete" action in the controller.
+                            - We use "POST" because deleting data modifies the database (NOT safe for GET).
+
+                            Form Routing:
+                            ************
+                            - asp-action="Delete" => Targets the "Delete" action method in "InstrumentsController"
+                            - asp-route-id="@instrument.Id":
+                                => Passes the current instrument's Id to the controller
+                                => Example: POST /Instruments/Delete/7
+                            *@ 
+                                    <form asp-action="Delete" asp-route-id="@instrument.Id" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                @* 
+                                    @Html.AntiForgeryToken()
+                                        => Protects against CSRF (Cross-Site Request Forgery) attacks
+                                        => Must match [ValidateAntiForgeryToken] in controller 
+                                *@
+
+                                @*
+                                Inline Confirmation (JavaScript) Reviewing :-)
+                                **********************************************
+                                onclick="return confirm(...)"
+                                    - "confirm()" displays a browser dialog with OK / Cancel
+                                    - If user clicks:
+                                        > OK => returns true => form submits
+                                        > Cancel => returns false => form submission is blocked
+                                    - Using "return":
+                                        > Returning false cancels the default action (form submission)
+                                        > Returning true allows the form to proceed
+
+                                NOTE:
+                                *****
+                                - Inline JS is acceptable here because the logic is simple and not reusable
+                                - For complex logic, use external JS (site.js) 
+                                *@
+                                <button type="submit"
+                                        class="btn btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this instrument  (@instrument.Name)?')">
+                                    Delete
+                                </button>
                             </form>
 
                             @* 
